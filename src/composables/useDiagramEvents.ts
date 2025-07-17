@@ -1,18 +1,10 @@
-import { ref } from "vue";
 import type { Node, Edge } from "@vue-flow/core";
 
 export function useDiagramEvents({
   selectedElements,
   isLocked,
-  nodes,
   edges,
-  addNodes,
   addEdges,
-  setNodes,
-  setEdges,
-  project,
-  closeContextMenu,
-  contextMenu,
 }: any) {
   // Node click
   const onNodeClick = (event: any) => {
@@ -86,58 +78,15 @@ export function useDiagramEvents({
   const onSelectionChange = (event: any) => {
     const { nodes: selectedNodes, edges: selectedEdges } = event;
     selectedElements.value = [
-      ...selectedNodes.map((node: Node) => ({ ...node, type: "node" as const })),
-      ...selectedEdges.map((edge: Edge) => ({ ...edge, type: "edge" as const })),
+      ...selectedNodes.map((node: Node) => ({
+        ...node,
+        type: "node" as const,
+      })),
+      ...selectedEdges.map((edge: Edge) => ({
+        ...edge,
+        type: "edge" as const,
+      })),
     ];
-  };
-
-  // Context menu
-  const onPaneContextMenu = (event: any) => {
-    if (isLocked.value) return;
-    event.preventDefault();
-    closeContextMenu();
-    selectedElements.value = [];
-    contextMenu.value = {
-      show: true,
-      x: event.clientX,
-      y: event.clientY,
-      target: null,
-      type: "canvas",
-    };
-  };
-
-  const onNodeContextMenu = (event: any) => {
-    if (isLocked.value) return;
-    const { event: mouseEvent, node } = event;
-    mouseEvent.preventDefault();
-    closeContextMenu();
-    if (!selectedElements.value.some((el: any) => el.id === node.id && el.type === "node")) {
-      selectedElements.value = [{ ...node, type: "node" }];
-    }
-    contextMenu.value = {
-      show: true,
-      x: mouseEvent.clientX,
-      y: mouseEvent.clientY,
-      target: node,
-      type: "node",
-    };
-  };
-
-  const onEdgeContextMenu = (event: any) => {
-    if (isLocked.value) return;
-    const { event: mouseEvent, edge } = event;
-    mouseEvent.preventDefault();
-    closeContextMenu();
-    if (!selectedElements.value.some((el: any) => el.id === edge.id && el.type === "edge")) {
-      selectedElements.value = [{ ...edge, type: "edge" }];
-    }
-    contextMenu.value = {
-      show: true,
-      x: mouseEvent.clientX,
-      y: mouseEvent.clientY,
-      target: edge,
-      type: "edge",
-    };
   };
 
   return {
@@ -145,8 +94,5 @@ export function useDiagramEvents({
     onEdgeClick,
     onConnect,
     onSelectionChange,
-    onPaneContextMenu,
-    onNodeContextMenu,
-    onEdgeContextMenu,
   };
-} 
+}

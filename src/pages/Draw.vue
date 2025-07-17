@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted } from "vue";
+import { onMounted } from "vue";
 import { VueFlow } from "@vue-flow/core";
 import { Controls } from "@vue-flow/controls";
 import { Background } from "@vue-flow/background";
@@ -8,10 +8,8 @@ import ControlsPanel from "@/components/ControlsPanel.vue";
 import { Lock } from "lucide-vue-next";
 import { useDiagramState } from "@/composables/useDiagramState";
 import { useDiagramEvents } from "@/composables/useDiagramEvents";
-import { useDiagramShortcuts } from "@/composables/useDiagramShortcuts";
 
 const diagramState = useDiagramState();
-
 
 const events = useDiagramEvents({
   selectedElements: diagramState.selectedElements,
@@ -23,18 +21,6 @@ const events = useDiagramEvents({
   setNodes: diagramState.setNodes,
   setEdges: diagramState.setEdges,
   project: diagramState.project,
-  contextMenu: diagramState.contextMenu,
-});
-const shortcuts = useDiagramShortcuts({
-  isLocked: diagramState.isLocked,
-  selectedElements: diagramState.selectedElements,
-  nodes: diagramState.nodes,
-  edges: diagramState.edges,
-  removeSelectedElements: diagramState.removeSelectedElements,
-  selectedTool: diagramState.selectedTool,
-  // closeContextMenu: () => {}, 
-  history: diagramState.history,
-  historyIndex: diagramState.historyIndex,
 });
 
 function handleUpdateNode(id: string, update: any) {
@@ -77,12 +63,7 @@ onMounted(() => {
       type: "custom",
     },
   ]);
-  document.addEventListener("keydown", shortcuts.handleKeyDown);
   diagramState.fitView();
-});
-
-onUnmounted(() => {
-  document.removeEventListener("keydown", shortcuts.handleKeyDown);
 });
 </script>
 
@@ -112,9 +93,6 @@ onUnmounted(() => {
         @edge-click="events.onEdgeClick"
         @connect="events.onConnect"
         @selection-change="events.onSelectionChange"
-        @pane-context-menu="events.onPaneContextMenu"
-        @node-context-menu="events.onNodeContextMenu"
-        @edge-context-menu="events.onEdgeContextMenu"
         @nodes-change="diagramState.saveState"
         @edges-change="diagramState.saveState"
         class="bg-gray-50"
@@ -148,8 +126,10 @@ onUnmounted(() => {
             @remove-selected="diagramState.removeSelectedElements"
           />
         </div>
-       
-        <Controls class="!bg-white !border !border-gray-200 !rounded-lg !shadow-lg" />
+
+        <Controls
+          class="!bg-white !border !border-gray-200 !rounded-lg !shadow-lg"
+        />
         <Background />
       </VueFlow>
     </div>

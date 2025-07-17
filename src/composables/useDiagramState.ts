@@ -1,14 +1,6 @@
 import { ref, watch, nextTick } from "vue";
 import { useVueFlow, type Node, type Edge } from "@vue-flow/core";
 
-interface ContextMenuState {
-  show: boolean;
-  x: number;
-  y: number;
-  target: Node | Edge | null;
-  type: "canvas" | "node" | "edge" | null;
-}
-
 export function useDiagramState() {
   // State
   const selectedElements = ref<any[]>([]);
@@ -16,13 +8,6 @@ export function useDiagramState() {
   const isLocked = ref<boolean>(false);
   const history = ref<any[]>([]);
   const historyIndex = ref<number>(-1);
-  const contextMenu = ref<ContextMenuState>({
-    show: false,
-    x: 0,
-    y: 0,
-    target: null,
-    type: null,
-  });
 
   const defaultViewport = { zoom: 1.5, x: 0, y: 0 };
   const {
@@ -92,7 +77,7 @@ export function useDiagramState() {
   };
 
   // Tool & Lock
-  const handleToolChange = (toolId: string, action: string) => {
+  const handleToolChange = (toolId: string) => {
     selectedTool.value = toolId;
   };
   const handleLockToggle = (locked: boolean) => {
@@ -106,12 +91,10 @@ export function useDiagramState() {
     const shapeConfig: any = {
       rectangle: {
         label: "Rectangle",
-        // description: "A rectangular node",
         shape: "rectangle",
       },
       circle: {
         label: "Circle",
-        // description: "A circular node",
         shape: "circle",
       },
     };
@@ -136,12 +119,15 @@ export function useDiagramState() {
       .filter((el: any) => el.type === "edge")
       .map((el: any) => el.id);
     const connectedEdgeIds = edges.value
-      .filter((edge: Edge) =>
-        nodeIdsToRemove.includes(edge.source) ||
-        nodeIdsToRemove.includes(edge.target)
+      .filter(
+        (edge: Edge) =>
+          nodeIdsToRemove.includes(edge.source) ||
+          nodeIdsToRemove.includes(edge.target)
       )
       .map((edge: Edge) => edge.id);
-    const allEdgeIdsToRemove = [...new Set([...edgeIdsToRemove, ...connectedEdgeIds])];
+    const allEdgeIdsToRemove = [
+      ...new Set([...edgeIdsToRemove, ...connectedEdgeIds]),
+    ];
     if (nodeIdsToRemove.length > 0) removeNodes(nodeIdsToRemove);
     if (allEdgeIdsToRemove.length > 0) removeEdges(allEdgeIdsToRemove);
     selectedElements.value = [];
@@ -153,11 +139,15 @@ export function useDiagramState() {
     (newSelection) => {
       const updatedNodes = nodes.value.map((node: Node) => ({
         ...node,
-        selected: newSelection.some((el: any) => el.id === node.id && el.type === "node"),
+        selected: newSelection.some(
+          (el: any) => el.id === node.id && el.type === "node"
+        ),
       }));
       const updatedEdges = edges.value.map((edge: Edge) => ({
         ...edge,
-        selected: newSelection.some((el: any) => el.id === edge.id && el.type === "edge"),
+        selected: newSelection.some(
+          (el: any) => el.id === edge.id && el.type === "edge"
+        ),
       }));
       setNodes(updatedNodes);
       setEdges(updatedEdges);
@@ -197,7 +187,6 @@ export function useDiagramState() {
     handleLockToggle,
     handleAddShape,
     removeSelectedElements,
-    contextMenu,
     project,
   };
-} 
+}
